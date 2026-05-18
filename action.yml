@@ -71,11 +71,11 @@ runs:
       shell: bash
       run: |
         if ! command -v cvm &> /dev/null; then
-          echo "Installing CVM 1.1.0..."
+          echo "Installing CVM 1.1.1..."
           # Install in a temporary directory to avoid modifying project's Cargo.lock
           TEMP_DIR=$(mktemp -d)
           cd "$TEMP_DIR"
-          cargo install cvm_cli --version 1.1.0 --locked
+          cargo install cvm_cli --version 1.1.1 --locked
           cd -
           rm -rf "$TEMP_DIR"
         else
