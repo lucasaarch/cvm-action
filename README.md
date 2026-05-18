@@ -258,7 +258,7 @@ Then commit manually in a subsequent step.
 | `new-version` | Release version after applying pending changes |
 | `crates` | JSON array of published crates with versions |
 
-> Requires **cvm_cli 1.1.1+** for workspace `version.workspace = true`, `cvm info --version`, `cvm apply` on inherited versions, and non-interactive `--crate` / `--bump` / `--summary`.
+> Requires **cvm_cli 1.1.2+** for workspace `version.workspace = true`, `cvm info --version`, `cvm apply` on inherited versions, and non-interactive `--crate` / `--bump` / `--summary`.
 
 ## 📁 Change File Format
 
