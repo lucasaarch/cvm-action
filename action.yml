@@ -39,13 +39,13 @@ outputs:
     description: "Whether crates were published"
     value: ${{ steps.publish.outputs.published }}
   version:
-    description: "Version that was published (for single crate projects)"
+    description: "Release version (workspace or unified publish output)"
     value: ${{ steps.publish.outputs.version }}
   new-version:
-    description: "New version after applying changes (for single crate projects)"
+    description: "Release version after applying changes"
     value: ${{ steps.get-version.outputs.new-version }}
   current-version:
-    description: "Current version (always available for single crate projects)"
+    description: "Current release version before apply/publish"
     value: ${{ steps.get-current-version.outputs.current-version }}
   crates:
     description: "JSON array of published crates with versions"
@@ -87,9 +87,7 @@ runs:
       shell: bash
       if: inputs.command != 'publish'
       run: |
-        # Always get the current version for use in later steps
-        RAW_VERSION=$(cvm info)
-        VERSION=$(echo "$RAW_VERSION" | tr -d '\n' | xargs)
+        VERSION=$(cvm info --version)
         echo "current-version=$VERSION" >> $GITHUB_OUTPUT
         echo "Current version: $VERSION"
 
@@ -123,12 +121,9 @@ runs:
       if: steps.apply.outputs.applied == 'true'
       shell: bash
       run: |
-        # Get version and trim all whitespace
-        RAW_VERSION=$(cvm info)
-        echo "Debug - Raw cvm info output: '$RAW_VERSION'"
-        VERSION=$(echo "$RAW_VERSION" | tr -d '\n' | xargs)
-        echo "Debug - Trimmed version: '$VERSION'"
+        VERSION=$(cvm info --version)
         echo "new-version=$VERSION" >> $GITHUB_OUTPUT
+        echo "New version: $VERSION"
 
     - name: Update Cargo.lock
       if: steps.apply.outputs.applied == 'true' && inputs.create-pr == 'true'
@@ -192,13 +187,10 @@ runs:
           if [ -n "$JSON_OUTPUT" ]; then
             echo "crates=$JSON_OUTPUT" >> $GITHUB_OUTPUT
 
-            # For single crate projects, extract version from first element
-            CRATE_COUNT=$(echo "$JSON_OUTPUT" | jq 'length')
-            if [ "$CRATE_COUNT" == "1" ]; then
-              VERSION=$(echo "$JSON_OUTPUT" | jq -r '.[0].version')
-              if [ -n "$VERSION" ] && [ "$VERSION" != "null" ]; then
-                echo "version=$VERSION" >> $GITHUB_OUTPUT
-              fi
+            # Unified release version when every published crate shares the same version
+            VERSION=$(echo "$JSON_OUTPUT" | jq -r '[.[].version] | unique | if length == 1 then .[0] else empty end')
+            if [ -n "$VERSION" ] && [ "$VERSION" != "null" ]; then
+              echo "version=$VERSION" >> $GITHUB_OUTPUT
             fi
           fi
         else

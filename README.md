@@ -253,8 +253,12 @@ Then commit manually in a subsequent step.
 | `has-changes` | Whether there are pending version changes (`true`/`false`) |
 | `applied` | Whether changes were applied (`true`/`false`) |
 | `published` | Whether crates were published (`true`/`false`) |
-| `version` | Version that was published (for single crate projects) |
+| `version` | Unified release version (from `cvm info --version`, or when all published crates share the same version) |
+| `current-version` | Current release version before apply/publish |
+| `new-version` | Release version after applying pending changes |
 | `crates` | JSON array of published crates with versions |
+
+> Requires **cvm_cli 1.0.10+** for workspace `version.workspace = true` and `cvm info --version`.
 
 ## 📁 Change File Format
 
