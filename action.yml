@@ -130,6 +130,11 @@ runs:
         echo "Debug - Trimmed version: '$VERSION'"
         echo "new-version=$VERSION" >> $GITHUB_OUTPUT
 
+    - name: Update Cargo.lock
+      if: steps.apply.outputs.applied == 'true' && inputs.create-pr == 'true'
+      shell: bash
+      run: cargo check
+
     - name: Create Pull Request
       if: steps.apply.outputs.applied == 'true' && inputs.create-pr == 'true'
       uses: peter-evans/create-pull-request@v5
